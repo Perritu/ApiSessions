@@ -1,0 +1,27 @@
+{
+  "name": "perritu/api-sessions",
+  "homepage": "https://github.com/Perritu/ApiSessions",
+  "license": "Unlicense",
+  "minimum-stability": "RC",
+  "keywords": [
+    "session manager",
+    "rest",
+    "api",
+    "session"
+  ],
+  "authors": [
+    {
+      "name": "Angel Garcia",
+      "email": "git@angelgarcia.dev"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Perritu\\ApiSessions\\": "src/"
+    }
+  },
+  "prefer-stable": true,
+  "require": {
+    "PHP": ">=8.5.0"
+  }
+}
