@@ -113,4 +113,49 @@ class ApiSessions
 
     return $oInstance;
   }
+
+  /**
+   * Magic method to access session data.
+   *
+   * @param string $cName Data name.
+   * @return mixed
+   */
+  public function __get(string $cName): mixed
+  {
+    return $this->oSession->{$cName};
+  }
+
+  /**
+   * Magic method to set session data.
+   *
+   * @param string $cName Data name.
+   * @param mixed $mValue Data value.
+   * @return void
+   */
+  public function __set(string $cName, mixed $mValue): void
+  {
+    $this->oSession->{$cName} = $mValue;
+  }
+
+  /**
+   * Magic method isset to check if session data exists.
+   *
+   * @param string $cName Data name.
+   * @return bool
+   */
+  public function __isset(string $cName): bool
+  {
+    return isset($this->oSession->{$cName});
+  }
+
+  /**
+   * Magic method unset to remove session data.
+   *
+   * @param string $cName Data name.
+   * @return void
+   */
+  public function __unset(string $cName): void
+  {
+    unset($this->oSession->{$cName});
+  }
 }
