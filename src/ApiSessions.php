@@ -89,16 +89,16 @@ final class ApiSessions
    * Returns an instance of ApiSessions.
    *
    * @param string $cIdentity String to be hashed and used as identifier.
-   * @param string|null $cStorageDir Directory to use as storage. Defaults to /tmp.
+   * @param string|null $cStorageDir Directory to use as storage. Defaults to system temporary directory.
    *
    * @return ApiSessions
    */
   public static function &Instance(string $cIdentity, ?string $cStorageDir = null): ApiSessions
   {
     if ($cStorageDir === null)
-      $cStorageDir = '/tmp';
+      $cStorageDir = sys_get_temp_dir() . '/apisessions';
 
-    if (!is_dir($cStorageDir) || !is_writable($cStorageDir))
+    if (!is_dir($cStorageDir) && !mkdir($cStorageDir, 0700, true))
       throw new \Exception(sprintf('Storage directory "%s" does not exist or is not writable.', $cStorageDir));
 
     $cHash = hash('gost', $cIdentity);
@@ -106,7 +106,7 @@ final class ApiSessions
     if (isset(self::$aInstances[$cHash]))
       return self::$aInstances[$cHash];
 
-    $oInstance = new static($cHash, $cStorageDir);
+    $oInstance = new self($cHash, $cStorageDir);
     self::$aInstances[$cHash] = $oInstance;
 
     register_shutdown_function([$oInstance, '____Shutdown']);
