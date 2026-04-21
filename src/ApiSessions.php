@@ -106,12 +106,16 @@ final class ApiSessions
     if (random_int(0, 100) >= 15) return;
 
     $uExpires = time() - 600; // 10 minutes
-    $fnWalker = function ($cDir) use (&$fnWalker, $uExpires) {
-      foreach (glob(sprintf('%s/*', $cDir)) as $cFile)
-        if (is_dir($cFile)) $fnWalker($cFile);
-        else if (filemtime($cFile) < $uExpires) unlink($cFile);
-    };
-    $fnWalker($this->cStorageDir);
+    foreach (new \DirectoryIterator($this->cStorageDir) as $oDir) {
+      if ($oDir->isDot() || !$oDir->isDir() || $oDir->isLink()) continue;
+      if (!preg_match('/^[a-f0-9]{2}$/', $oDir->getFilename())) continue;
+
+      foreach (new \DirectoryIterator($oDir->getPathname()) as $oFile) {
+        if ($oFile->isDot() || !$oFile->isFile() || $oFile->isLink()) continue;
+        if ($oFile->getExtension() !== 'json') continue;
+        if ($oFile->getMTime() < $uExpires) unlink($oFile->getPathname());
+      }
+    }
   }
 
   /**
