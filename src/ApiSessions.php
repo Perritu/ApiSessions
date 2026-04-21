@@ -33,6 +33,16 @@ final class ApiSessions
   protected $cStorageDir = null;
 
   /**
+   * @var int Time in seconds until the session expires.
+   */
+  protected $uExpires = 600;
+
+  /**
+   * @var bool Flag to prevent duplicate GC calls.
+   */
+  protected $bGarbageCollect = false;
+
+  /**
    * Instance constructor.
    *
    * @param string $cIdentifier Session identifier.
@@ -103,9 +113,20 @@ final class ApiSessions
       is_file($cTempFile) && unlink($cTempFile);
     }
 
-    if (random_int(0, 100) >= 15) return;
+    if (random_int(0, 100) <= 15) $this->____GarbageCollect();
+  }
 
-    $uExpires = time() - 600; // 10 minutes
+  /**
+   * Perform the storage cleanup.
+   *
+   * @return void
+   */
+  protected function ____GarbageCollect(): void
+  {
+    if ($this->bGarbageCollect) return;
+    $this->bGarbageCollect = true;
+
+    $uExpires = time() - $this->uExpires;
     foreach (new \DirectoryIterator($this->cStorageDir) as $oDir) {
       if ($oDir->isDot() || !$oDir->isDir() || $oDir->isLink()) continue;
       if (!preg_match('/^[a-f0-9]{2}$/', $oDir->getFilename())) continue;
