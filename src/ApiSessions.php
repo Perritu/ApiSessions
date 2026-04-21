@@ -10,7 +10,7 @@ namespace Perritu\ApiSessions;
  *
  * @package Perritu\ApiSessions
  */
-class ApiSessions
+final class ApiSessions
 {
   /**
    * @var array Instances cache.
@@ -18,9 +18,9 @@ class ApiSessions
   protected static $aInstances = [];
 
   /**
-   * @var stdClass Session data.
+   * @var \stdClass Session data.
    */
-  protected $oSession = null;
+  protected ?\stdClass $oSession = null;
 
   /**
    * @var string Session identifier.
