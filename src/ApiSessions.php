@@ -154,7 +154,7 @@ final class ApiSessions
    */
   public function __get(string $cName): mixed
   {
-    return $this->oSession->{$cName};
+    return $this->oSession->{$cName} ?? null;
   }
 
   /**
