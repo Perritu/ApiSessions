@@ -51,7 +51,17 @@ final class ApiSessions
     );
 
     if (file_exists($cStorageFile)) {
-      $this->oSession = json_decode(file_get_contents($cStorageFile));
+      $cPayload = file_get_contents($cStorageFile);
+      if ($cPayload === false) {
+        throw new \RuntimeException(sprintf('Unable to read session file "%s".', $cStorageFile));
+      }
+
+      $oSession = json_decode($cPayload, false, 512, JSON_THROW_ON_ERROR);
+      if (!$oSession instanceof \stdClass) {
+        throw new \RuntimeException(sprintf('Session file "%s" must contain a JSON object.', $cStorageFile));
+      }
+
+      $this->oSession = $oSession;
     } else {
       $this->oSession = new \stdClass();
     }
