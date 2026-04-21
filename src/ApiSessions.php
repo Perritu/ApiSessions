@@ -81,8 +81,24 @@ final class ApiSessions
       substr($this->cIdentifier, 2)
     );
 
-    if (!is_dir(dirname($cStorageFile))) mkdir(dirname($cStorageFile), 0700, true);
-    file_put_contents($cStorageFile, json_encode($this->oSession));
+    $cStoragePath = dirname($cStorageFile);
+    if (!is_dir($cStoragePath) && !mkdir($cStoragePath, 0700, true)) {
+      throw new \RuntimeException(sprintf('Unable to create session directory "%s".', $cStoragePath));
+    }
+
+    $cPayload = json_encode($this->oSession, JSON_THROW_ON_ERROR);
+    $cTempFile = "{$cStoragePath}." . random_int(0, 9999);
+
+    try {
+      if (file_put_contents($cTempFile, $cPayload, LOCK_EX) === false)
+        throw new \RuntimeException(sprintf('Unable to write temporary session file "%s".', $cTempFile));
+
+      chmod($cTempFile, 0600);
+      if (!rename($cTempFile, $cStorageFile))
+        throw new \RuntimeException(sprintf('Unable to replace session file "%s".', $cStorageFile));
+    } finally {
+      is_file($cTempFile) && unlink($cTempFile);
+    }
 
     if (random_int(0, 100) >= 15) return;
 
