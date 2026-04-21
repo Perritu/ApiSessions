@@ -82,12 +82,15 @@ final class ApiSessions
     );
 
     $cStoragePath = dirname($cStorageFile);
-    if (!is_dir($cStoragePath) && !mkdir($cStoragePath, 0700, true)) {
+    if (!is_dir($cStoragePath) && !mkdir($cStoragePath, 0700, true))
       throw new \RuntimeException(sprintf('Unable to create session directory "%s".', $cStoragePath));
-    }
+
+    if (!is_writable($cStoragePath))
+      throw new \RuntimeException(sprintf('Session directory "%s" is not writable.', $cStoragePath));
 
     $cPayload = json_encode($this->oSession, JSON_THROW_ON_ERROR);
-    $cTempFile = "{$cStoragePath}." . random_int(0, 9999);
+    if (!($cTempFile = tempnam($cStoragePath, basename($cStorageFile) . '.')))
+      throw new \RuntimeException(sprintf('Unable to create temporary session file in "%s".', $cStoragePath));
 
     try {
       if (file_put_contents($cTempFile, $cPayload, LOCK_EX) === false)
@@ -126,6 +129,9 @@ final class ApiSessions
 
     if (!is_dir($cStorageDir) && !mkdir($cStorageDir, 0700, true))
       throw new \Exception(sprintf('Storage directory "%s" does not exist or is not writable.', $cStorageDir));
+
+    if (!is_writable($cStorageDir))
+      throw new \Exception(sprintf('Storage directory "%s" is not writable.', $cStorageDir));
 
     $cHash = hash('gost', $cIdentity);
 
