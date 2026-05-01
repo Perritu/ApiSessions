@@ -145,9 +145,9 @@ class ApiSessions
    * @param string $cIdentity String to be hashed and used as identifier.
    * @param string|null $cStorageDir Directory to use as storage. Defaults to system temporary directory.
    *
-   * @return ApiSessions
+   * @return static
    */
-  public static function &Instance(string $cIdentity, ?string $cStorageDir = null): ApiSessions
+  public static function &Instance(string $cIdentity, ?string $cStorageDir = null): static
   {
     if ($cStorageDir === null)
       $cStorageDir = sys_get_temp_dir() . '/apisessions';
@@ -160,11 +160,11 @@ class ApiSessions
 
     $cHash = hash('gost', $cIdentity);
 
-    if (isset(self::$aInstances[$cHash]))
-      return self::$aInstances[$cHash];
+    if (isset(self::$aInstances[static::class][$cHash]))
+      return self::$aInstances[static::class][$cHash];
 
-    $oInstance = new self($cHash, $cStorageDir);
-    self::$aInstances[$cHash] = $oInstance;
+    $oInstance = new static($cHash, $cStorageDir);
+    self::$aInstances[static::class][$cHash] = $oInstance;
 
     register_shutdown_function([$oInstance, '____Shutdown']);
 
