@@ -10,7 +10,7 @@ namespace Perritu\ApiSessions;
  *
  * @package Perritu\ApiSessions
  */
-final class ApiSessions
+class ApiSessions
 {
   /**
    * @var array Instances cache.
